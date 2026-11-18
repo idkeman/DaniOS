@@ -35,7 +35,7 @@ The DaniOS virtual drive is stored in IndexedDB in the current browser profile. 
 Where supported, DaniOS can request access to:
 - Camera and microphone through `getUserMedia`.
 - Bluetooth Low Energy through Web Bluetooth.
-- USB devices through WebUSB.
+- USB devices through WebUSB (enter the USB vendor ID in hexadecimal; the Device Center defaults to `2341`, Arduino's vendor ID).
 - Serial devices through Web Serial.
 - Screen capture through `getDisplayMedia`.
 - Clipboard read/write through the Async Clipboard API.
