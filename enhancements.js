@@ -176,7 +176,7 @@ document.addEventListener('dblclick',e=>{const b=e.target.closest('.x-file');if(
 document.addEventListener('contextmenu',e=>{const b=e.target.closest('.x-file');if(b){e.preventDefault();fileContext(b.dataset.file,e);}},true);
 document.addEventListener('submit',e=>{if(e.target.matches('.x-todoform')){e.preventDefault();const input=$('input[name="task"]',e.target),n=read('todo',[]);if(input.value.trim()){n.push({text:input.value.trim(),done:false});write('todo',n);input.value='';renderTodo(e.target.closest('.window'));}}},true);
 document.addEventListener('click',e=>{const f=e.target.closest('.x-file');if(f){$$('.x-file.selected',f.closest('.window')).forEach(x=>x.classList.remove('selected'));f.classList.add('selected');}},true);
-document.addEventListener('click',async e=>{if(e.target.id==='unlockBtn'){e.preventDefault();e.stopImmediatePropagation();if(state.pin){const i=$('#x-lockpin'),h=await pinHash(i?.value||'');if(h!==state.pin){OS.toast('Incorrect PIN');return;}}$('#lockscreen').classList.add('hidden');}},true);
+document.addEventListener('click',async e=>{if(e.target.closest('#unlockBtn')){e.preventDefault();e.stopImmediatePropagation();if(state.pin){const i=$('#x-lockpin'),h=await pinHash(i?.value||'');if(h!==state.pin){OS.toast('Incorrect PIN');return;}}$('#lockscreen').classList.add('hidden');}},true);
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e;});
 window.addEventListener('online',()=>OS.toast('Browser is online'));window.addEventListener('offline',()=>OS.toast('Browser is offline'));
 window.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='e'){e.preventDefault();OS.openApp('explorer');}if(e.ctrlKey&&e.shiftKey&&e.key==='Escape'){e.preventDefault();OS.openApp('tasks');}if(e.ctrlKey&&e.key===','){e.preventDefault();OS.openApp('settings');}});
@@ -228,5 +228,24 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-calc]');if
 document.addEventListener('keydown',e=>{const w=e.target.closest('.window[data-app="calculator"]');if(!w)return;const keys={'Enter':'=','Backspace':'⌫','Escape':'AC'};const k=keys[e.key]||e.key;if(/^[0-9.+*/%^-]$/.test(k)||['=','⌫','AC'].includes(k)){calcKey(w,k);e.preventDefault();e.stopImmediatePropagation();}},true);
 
 renderStart('');
+
+/* Explicit shell actions used by the desktop and window chrome. */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-action]');
+ if(b){const w=b.closest('.window');if(w){const a=b.dataset.action;e.preventDefault();e.stopImmediatePropagation();
+  if(a==='min'||a==='minimize'){w.classList.add('minimized');w.classList.remove('focused');OS.taskbar();}
+  else if(a==='max'||a==='maximize'||a==='restore'){if(!w.dataset.preMax){w.dataset.preMax=JSON.stringify({left:w.style.left,top:w.style.top,width:w.style.width,height:w.style.height});Object.assign(w.style,{left:'0',top:'0',width:'100%',height:'calc(100% - 54px)'});w.classList.add('maximized');}else{try{const p=JSON.parse(w.dataset.preMax);Object.assign(w.style,p);}catch(_){}delete w.dataset.preMax;w.classList.remove('maximized');}OS.focus(w);}
+  else if(a==='close'){w.remove();OS.taskbar();}
+  return;
+ }}
+ if(e.target.closest('#wifiBtn')){e.preventDefault();e.stopImmediatePropagation();$('#quickPanel').classList.toggle('hidden');$('#notifyPanel')?.classList.add('hidden');return;}
+ if(e.target.closest('#notifyBtn')){e.preventDefault();e.stopImmediatePropagation();$('#notifyPanel').classList.toggle('hidden');$('#quickPanel')?.classList.add('hidden');return;}
+ if(e.target.closest('#desktopBtn')){e.preventDefault();e.stopImmediatePropagation();$('#desktopPanel').classList.toggle('hidden');renderDesktopChoices();return;}
+ if(e.target.closest('#newDesktop')){e.preventDefault();e.stopImmediatePropagation();addDesktop();return;}
+ if(e.target.closest('#clearNotifications')){e.preventDefault();e.stopImmediatePropagation();OS.getNotifications().length=0;write('notices',[]);const n=$('#notifications');if(n)n.textContent='No notifications';OS.toast('Notifications cleared');return;}
+ const cal=e.target.closest('[data-calendar]');
+ if(cal){const w=cal.closest('.window');if(w&&cal.dataset.calendar==='save'){e.preventDefault();e.stopImmediatePropagation();const d=$('.calendar-date',w)?.value||new Date().toISOString().slice(0,10);localStorage.setItem('danios-calendar-'+d,$('textarea',w)?.value||'');OS.toast('Calendar note saved');}return;}
+},true);
+
 window.DaniOSReady=true;window.DaniOSVersion='3.0.0';console.info('DaniOS 3.0 enhancements loaded.');
 })();
