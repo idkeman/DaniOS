@@ -1,4 +1,6 @@
 import http from 'node:http';
+import { lookup } from 'node:dns/promises';
+import { getClientAddress, normalizeResolvedAddress } from './proxy-security.mjs';
 import path from 'node:path';
 import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -16,9 +18,12 @@ wisp.options.allow_private_ips = false;
 wisp.options.allow_loopback_ips = false;
 wisp.options.allow_udp_streams = false;
 wisp.options.port_whitelist = [80, 443];
+wisp.options.stream_limit_total = 128;
+wisp.options.dns_method = async hostname => normalizeResolvedAddress((await lookup(hostname, {verbatim:true})).address);
 wisp.options.hostname_blacklist = [new RegExp('^(localhost|.*[.]localhost|.*[.]local)$', 'i'), new RegExp('^metadata[.]google[.]internal$', 'i')];
 const wispClients = new Map();
-const MAX_WISP_CONNECTIONS_PER_IP = 8;
+const activeWispSockets = new Set();
+const MAX_WISP_CONNECTIONS_PER_IP = 32;
 const mounts = [
   ['/scram/', scramjetPath],
   ['/utils/', packageDir('@mercuryworkshop/scramjet-utils')],
@@ -38,7 +43,7 @@ const securityHeaders = {
   'Referrer-Policy':'strict-origin-when-cross-origin',
   'Cross-Origin-Opener-Policy':'same-origin',
   'Cross-Origin-Embedder-Policy':'require-corp',
-  'Permissions-Policy':'camera=(self), microphone=(self), geolocation=(self), bluetooth=(self), usb=(self), serial=(self), display-capture=(self), clipboard-read=(self), clipboard-write=(self)',
+  'Permissions-Policy':'camera=(self), microphone=(self), geolocation=(self), usb=(self), serial=(self), display-capture=(self), clipboard-read=(self), clipboard-write=(self)',
   'Content-Security-Policy':"default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; frame-src 'self' https: http: data: blob:; connect-src 'self' https: wss: ws: data: blob:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:"
 };
 function send(res,status,body,type='application/json; charset=utf-8',extra={}) {
@@ -90,7 +95,7 @@ server.on('upgrade',(req,socket,head)=>{
     socket.destroy();
     return;
   }
-  const ip = req.socket.remoteAddress || 'unknown';
+  const ip = getClientAddress(req);
   const active = wispClients.get(ip) || 0;
   if (active >= MAX_WISP_CONNECTIONS_PER_IP) {
     socket.write('HTTP/1.1 429 Too Many Requests\r\nConnection: close\r\n\r\n');
@@ -98,7 +103,9 @@ server.on('upgrade',(req,socket,head)=>{
     return;
   }
   wispClients.set(ip, active + 1);
+  activeWispSockets.add(socket);
   socket.once('close',()=>{
+    activeWispSockets.delete(socket);
     const remaining = (wispClients.get(ip) || 1) - 1;
     if (remaining > 0) wispClients.set(ip,remaining);
     else wispClients.delete(ip);
@@ -107,4 +114,8 @@ server.on('upgrade',(req,socket,head)=>{
   wisp.routeRequest(req,socket,head);
 });
 server.listen(PORT,'0.0.0.0',()=>console.log('DaniOS '+VERSION+' with Scramjet proxy listening on '+PORT));
-for (const signal of ['SIGINT','SIGTERM']) process.on(signal,()=>server.close(()=>process.exit(0)));
+for (const signal of ['SIGINT','SIGTERM']) process.on(signal,()=>{
+  for (const socket of activeWispSockets) socket.destroy();
+  server.close(()=>process.exit(0));
+  setTimeout(()=>process.exit(0),5000).unref();
+});

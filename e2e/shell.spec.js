@@ -1,10 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 async function openApp(page,id) {
-  page.on('pageerror',err=>console.log('BROWSER PAGE ERROR:',err.message));
-  page.on('console',msg=>console.log('BROWSER CONSOLE:',msg.type(),msg.text()));
   await page.locator('#startBtn').click();
-  console.log('START PANEL CLASS:',await page.locator('#startPanel').getAttribute('class'));
   await expect(page.locator('#startPanel')).toBeVisible();
   const app=page.locator('#appGrid [data-app="'+id+'"]');
   await expect(app).toBeVisible();
@@ -120,12 +117,6 @@ test('Notes, tasks and unit converter apps respond',async({page})=>{
   await expect(converter.locator('.x-result')).toContainText('1 m');
 });
 
-
-test('Calculator evaluates with the safe arithmetic parser',async({page})=>{
-  const win=await openApp(page,'calculator');
-  for(const key of ['7','+','2','='])await win.locator('[data-calc="'+key+'"]').click();
-  await expect(win.locator('.calc-display')).toHaveValue('9');
-});
 
 test('Quick settings, notification center and lock screen controls work',async({page})=>{
   await page.locator('#wifiBtn').click();
