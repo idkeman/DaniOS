@@ -1,44 +1,73 @@
 # DaniOS
 
-DaniOS is a browser-based desktop environment simulator inspired by Windows 11. It runs as a static website; it does **not** replace Windows, Linux, macOS, or a native operating system.
+DaniOS is a Windows-inspired desktop environment that runs as a web application. It provides a desktop shell, app windows, a virtual drive and browser-permission-based access to selected device APIs. It is not a native operating system.
 
-## Run it
+## Run locally
 
-- Open the GitHub Pages deployment if enabled, or serve this repository with any static web server.
-- For local development, run `npm install` (no runtime dependencies) and `npm run check`.
-- Service workers, installability, and some browser APIs require HTTPS or localhost.
+- Node.js 20 or newer: `npm start` serves DaniOS at `http://localhost:3000`.
+- Run checks with `npm run check` and `npm test`.
+- For GitHub Pages, the site can also be served statically from the repository root.
+- HTTPS or localhost is required for service workers and most permission-gated APIs.
 
-## Included features
+## Desktop and shell
 
-- Desktop shell with wallpaper, desktop shortcuts, Start menu, app search, taskbar, clock, notifications, quick settings and context menu.
-- Draggable, focusable, minimizable, maximizable and closable app windows.
-- Virtual desktops (taskbar switcher; Ctrl+Alt+Left/Right; F2 creates a desktop).
-- File Explorer with a virtual directory tree, folder creation, uploads, file opening and IndexedDB-backed storage.
-- Notepad with explicit save/open workflow; Calculator; Terminal with a small, sandboxed virtual command set.
-- Browser window with an address field and iframe-based browsing. Many websites deliberately block embedding; use “Open in system browser” for those sites.
-- Settings surfaces for system, personalization, accounts, networking, Bluetooth/device, accessibility, privacy, updates, storage, apps, time and About.
-- Wallpaper and accent customization, simulated lock screen, Paint canvas, Photos preview, media playback, Calendar notes, Clock/timer and Task Manager.
-- PWA manifest and an offline app-shell service worker.
+- Start menu and app search, desktop shortcuts, taskbar app toggles, notification center, quick settings, system clock and context menus.
+- Draggable, resizable, focusable, minimizable, maximizable and closable windows, with edge snapping.
+- Multiple virtual desktops, persisted between sessions.
+- Lock screen with an optional local DaniOS PIN. This is an app-level gate, not a native OS security boundary.
+- Light/dark/midnight themes, wallpaper presets and upload, accent color, brightness, text scaling, high contrast and reduced motion.
 
-## Data and privacy
+## Applications
 
-Virtual files and calendar notes are stored in the current browser profile (IndexedDB/localStorage). They are not synced to a server. Clearing site data can remove them. Uploaded files stay in browser storage unless the user downloads or otherwise shares them. Browser permissions are requested only when a user activates a feature that needs them.
+- File Explorer: create files/folders, search, navigate, upload, import a chosen local folder, download, rename, move and delete.
+- Recycle Bin: restore deleted virtual files or permanently remove them.
+- Notepad: create, open, edit, save, save as, download and print.
+- Calculator, Terminal, Browser, Paint, Photos, Media Player, Calendar, Clock and Task Manager.
+- App Store, Sticky Notes, To-do List, Clipboard, Camera & Recorder, Device Center, Unit Converter, Weather, System Monitor and Help.
+- Browser tabs, navigation history and bookmarks. Websites that block iframe embedding must be opened in a normal browser tab.
 
-## Browser limitations (important)
+## Storage and backup
 
-A website cannot implement every Windows feature. DaniOS cannot provide a Windows kernel, native process isolation, arbitrary host filesystem access, registry access, device drivers, Windows Update, native sign-in/security boundaries, full system networking controls, real power actions, or unrestricted access to hardware. Bluetooth and other device APIs vary by browser and often require HTTPS, user gestures, and explicit permission. Quick toggles and account/power controls that do not have a corresponding web API are clearly simulations.
+The DaniOS virtual drive is stored in IndexedDB in the current browser profile. It is separate from your computer's normal filesystem. File Explorer can import a selected local directory where the File System Access API is supported, and can export or restore a DaniOS JSON backup. Clearing browser site data can delete local files and settings; keep a backup.
 
-The browser window is not a full browser engine: cross-origin iframe restrictions, CSP, X-Frame-Options and browser security rules prevent many sites from loading inside it.
+## Browser API integrations
+
+Where supported, DaniOS can request access to:
+- Camera and microphone through `getUserMedia`.
+- Bluetooth Low Energy through Web Bluetooth.
+- USB devices through WebUSB.
+- Serial devices through Web Serial.
+- Screen capture through `getDisplayMedia`.
+- Clipboard read/write through the Async Clipboard API.
+- Local directories through the File System Access API.
+- Persistent storage and screen wake lock.
+
+These APIs require compatible browsers, HTTPS or localhost, a user gesture and explicit permission. Web Bluetooth, WebUSB, Web Serial and File System Access are not available in every browser. DaniOS cannot install drivers or take over OS pairing controls.
+
+## Railway hosting
+
+The repository includes `server.mjs` and `railway.json`. The Node server serves the static desktop and exposes:
+- `/api/health` — deployment health check.
+- `/api/version` — running version and build.
+- `/api/capabilities` — hosting and storage capability description.
+
+To deploy, connect `idkeman/DaniOS` to a new Railway service and deploy the `main` branch. Railway currently refused creation of a new project because the account has reached its free-plan resource limit; no unrelated Railway project was modified. Once capacity is available, the committed config is ready for Railpack.
+
+Railway's Node server is for hosting and health checks only. DaniOS files remain local to the browser; cloud account sync is not configured.
+
+## What a browser app cannot do
+
+A website cannot provide a Windows kernel, native process isolation, registry access, device drivers, arbitrary filesystem access without user permission, Windows Update, real shutdown/restart, host Wi-Fi/airplane-mode switches, system-wide volume or display control, or native account security. Those controls are either clearly marked simulations or delegated to the browser/host OS.
 
 ## Troubleshooting
 
-- **Blank or stale app after an update:** hard-refresh the page. If necessary, clear this site's cached data/service worker in browser site settings and reload.
-- **Files do not persist:** use a modern browser with IndexedDB enabled; avoid private browsing modes that clear storage on exit.
-- **Install/offline unavailable:** serve over HTTPS or localhost. Service workers do not work from arbitrary `file://` URLs.
-- **A website is blank in Browser:** the destination likely blocks iframe embedding. Open it in the system browser instead.
-- **Bluetooth option unavailable:** use a supported browser on HTTPS; the host OS must have Bluetooth enabled. Pairing is still controlled by the host OS.
-- **Display, sound, power, network, update or account settings do not change the computer:** those settings are simulated because a web page has no native OS privileges.
+- **Blank or old version:** hard-refresh. If needed, remove the site's service worker/cache in browser site settings and reload.
+- **Files not persisting:** use a modern browser with IndexedDB enabled and avoid private mode that clears data on exit.
+- **Device feature unavailable:** use a supported browser on HTTPS or localhost and approve the browser prompt.
+- **Browser page is blank:** the destination may block iframes; use the Browser app's external-open button.
+- **Install prompt missing:** open DaniOS over HTTPS, load it once online, then use the browser's Install app option if supported.
+- **Railway deploy cannot be created:** free-plan resource limits may need to be cleared or the account plan upgraded.
 
-## Quality checks
+## External implementation references
 
-Run `npm run check` to parse the inline JavaScript and verify key app-shell hooks. The repository also includes a GitHub Actions workflow that runs this check on pushes and pull requests.
+The DaniOS feature audit used the MIT-licensed [WebOS browser desktop](https://github.com/Martin-R-D/WebOS) and [WinboxJS](https://github.com/winboxjs/winboxjs.github.io) as architectural references for window management, virtual files, app lifecycle and browser desktop UX. DaniOS does not vendor their source files.
