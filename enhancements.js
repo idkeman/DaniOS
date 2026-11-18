@@ -225,7 +225,7 @@ function calcKey(w,key){
  else if(/^[+*/^-]$/.test(v)){d.value=s.replace(/[+*/^-]$/,'')+v;}
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calc]');if(!b)return;const w=b.closest('.window');if(!w)return;e.preventDefault();e.stopImmediatePropagation();calcKey(w,b.dataset.calc);},true);
-document.addEventListener('keydown',e=>{const w=e.target.closest('.window[data-app="calculator"]');if(!w)return;const keys={'Enter':'=','Backspace':'⌫','Escape':'AC'};const k=keys[e.key]||e.key;if(/^[0-9.+\\-*/%^]$/.test(k)||['=','⌫','AC'].includes(k)){calcKey(w,k);e.preventDefault();e.stopImmediatePropagation();}},true);
+document.addEventListener('keydown',e=>{const w=e.target.closest('.window[data-app="calculator"]');if(!w)return;const keys={'Enter':'=','Backspace':'⌫','Escape':'AC'};const k=keys[e.key]||e.key;if(/^[0-9.+*/%^-]$/.test(k)||['=','⌫','AC'].includes(k)){calcKey(w,k);e.preventDefault();e.stopImmediatePropagation();}},true);
 
 renderStart('');
 window.DaniOSReady=true;window.DaniOSVersion='3.0.0';console.info('DaniOS 3.0 enhancements loaded.');
