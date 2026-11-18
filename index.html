@@ -120,5 +120,17 @@ window.addEventListener('resize',()=>document.querySelectorAll('.window').forEac
 openDB().then(async d=>{db=d;if(db){const existing=await allFiles();if(!existing.length)for(const [path,type,content] of seed)await putFile({path,type,content})}toast('DaniOS ready — your virtual files stay in this browser profile.');}).catch(()=>toast('Storage unavailable; some features may not persist.'));
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 setInterval(updateClock,1000);updateClock();
+window.DaniOS={
+ apps:apps,openApp:(id)=>openApp(id),toast:(msg)=>toast(msg),allFiles:()=>allFiles(),putFile:(file)=>putFile(file),removeFile:(path)=>removeFile(path),
+ getContentRenderer:()=>contentFor,setContentRenderer:(fn)=>{contentFor=fn},
+ getSettingsRenderer:()=>settingsPage,setSettingsRenderer:(fn)=>{settingsPage=fn},
+ getFileRenderer:()=>renderFiles,setFileRenderer:(fn)=>{renderFiles=fn},
+ getOpenFile:()=>openTextFile,setOpenFile:(fn)=>{openTextFile=fn},
+ getRemoveFile:()=>removeFile,setRemoveFile:(fn)=>{removeFile=fn},
+ getToast:()=>toast,setToast:(fn)=>{toast=fn},
+ getStartRenderer:()=>renderStart,setStartRenderer:(fn)=>{renderStart=fn},
+ focus:(w)=>focus(w),taskbar:()=>taskbar(),switchDesktop:(i)=>switchDesktop(i),addDesktop:()=>addDesktop(),lock:()=>lock(),
+ getDesktop:()=>desktop,getNotifications:()=>notifications,getDb:()=>db
+};
 })();
-</script></body></html>
+</script><script src="./enhancements.js"></script></body></html>
