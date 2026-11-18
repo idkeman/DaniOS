@@ -136,7 +136,7 @@ test('Quick settings, notification center and lock screen controls work',async({
 test('PNG wallpaper upload validates, applies immediately and survives reload',async({page})=>{
   const settings=await openApp(page,'settings');
   await settings.locator('[data-x="settingtab"][data-tab="Personalization"]').click();
-  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=','base64');
+  const zlib=await import('node:zlib');\n  const crc32=data=>{let c=0xffffffff;for(const byte of data){c^=byte;for(let k=0;k<8;k++)c=(c>>>1)^((c&1)?0xedb88320:0);}return (c^0xffffffff)>>>0;};\n  const chunk=(type,data)=>{const name=Buffer.from(type);const body=Buffer.concat([name,data]);const out=Buffer.alloc(12+data.length);out.writeUInt32BE(data.length,0);body.copy(out,4);out.writeUInt32BE(crc32(body),4+body.length);return out;};\n  const ihdr=Buffer.alloc(13);ihdr.writeUInt32BE(1,0);ihdr.writeUInt32BE(1,4);ihdr[8]=8;ihdr[9]=6;\n  const png=Buffer.concat([Buffer.from([137,80,78,71,13,10,26,10]),chunk('IHDR',ihdr),chunk('IDAT',zlib.deflateSync(Buffer.from([0,35,125,190,255]))),chunk('IEND',Buffer.alloc(0))]);
   await settings.locator('[data-wallfile]').setInputFiles({name:'test-wallpaper.png',mimeType:'image/png',buffer:png});
   await expect(settings.locator('.x-wallpaper-status')).toContainText('test-wallpaper.png');
   await expect.poll(async()=>page.evaluate(async()=>{const fs=await window.DaniOS.allFiles();return fs.some(f=>f.path.endsWith('.png')&&f.blob instanceof Blob)})).toBe(true);
