@@ -45,11 +45,21 @@ test('File Explorer creates folders and sends deleted items to Recycle Bin',asyn
   await expect(page.locator('.window[data-app="recycle"] .x-trash')).toContainText('E2E Folder');
 });
 
+test('Scramjet proxy reaches a live website through the Wisp tunnel',async({page})=>{
+  const win=await openApp(page,'browser');
+  await win.locator('.x-address').fill('https://example.com');
+  await win.locator('[data-x="bgo"]').click();
+  await expect(win.locator('.x-status')).toContainText('Proxy connected',{timeout:30000});
+  await expect(win.locator('.x-frame').contentFrame().locator('body')).toContainText('This domain is for use in documentation examples',{timeout:15000});
+  await win.locator('[data-x="bsave"]').click();
+  await expect.poll(async()=>page.evaluate(async()=>{const files=await window.DaniOS.allFiles();return files.some(f=>f.path.startsWith('/Downloads/example.com-')&&f.content?.includes('This domain is for use in documentation examples'));})).toBe(true);
+});
+
 test('Browser tabs, bookmarks and navigation work',async({page})=>{
   const win=await openApp(page,'browser');
   await win.locator('.x-address').fill('https://example.com');
   await win.locator('[data-x="bgo"]').click();
-  await expect(win.locator('.x-frame')).toHaveAttribute('src','https://example.com/');
+  await expect(win.locator('.x-frame')).toHaveAttribute('src',/\/\~\/sj\/.+https%3A%2F%2Fexample.com%2F/);
   await win.locator('[data-x="bmark"]').click();
   await expect(win.locator('.x-bookmarks')).toContainText('example.com');
   await win.locator('[data-x="bnew"]').click();
