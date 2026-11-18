@@ -6,7 +6,7 @@ DaniOS is a Windows-inspired desktop environment that runs as a web application.
 
 - Node.js 20 or newer: `npm start` serves DaniOS at `http://localhost:3000`.
 - Run static checks with `npm run check`, backend tests with `npm test`, and browser end-to-end tests with `npm run test:e2e` (after `npm install --no-save @playwright/test` and `npx playwright install chromium`).
-- For GitHub Pages, the site can also be served statically from the repository root.
+- For GitHub Pages, enable **Settings → Pages → Build and deployment → GitHub Actions** once. The committed `pages.yml` workflow then deploys the static app to `https://idkeman.github.io/DaniOS/` on pushes to `main. The Railway Node server is not needed for the static Pages deployment.
 - HTTPS or localhost is required for service workers and most permission-gated APIs.
 
 ## Desktop and shell
