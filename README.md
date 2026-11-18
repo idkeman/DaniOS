@@ -46,12 +46,12 @@ These APIs require compatible browsers, HTTPS or localhost, a user gesture and e
 
 ## Railway hosting
 
-The repository includes `server.mjs` and `railway.json`. The Node server serves the static desktop and exposes:
+The repository includes `server.mjs` and current Railway Infrastructure as Code at `.railway/railway.ts`. The Node server serves the static desktop and exposes:
 - `/api/health` — deployment health check.
 - `/api/version` — running version and build.
 - `/api/capabilities` — hosting and storage capability description.
 
-To deploy, connect `idkeman/DaniOS` to a new Railway service and deploy the `main` branch. Railway currently refused creation of a new project because the account has reached its free-plan resource limit; no unrelated Railway project was modified. Once capacity is available, the committed config is ready for Railpack.
+To deploy, install the Railway CLI (5.42.1 or newer), authenticate, ensure the Railway account has resource capacity, then run `railway config plan` followed by `railway config apply` from the repository root. The IaC file points at `idkeman/DaniOS` on `main`. Railway currently refused creation of a new project because the account has reached its free-plan resource limit; no unrelated Railway project was modified. Once capacity is available, the committed IaC definition can create the DaniOS web service.
 
 Railway's Node server is for hosting and health checks only. DaniOS files remain local to the browser; cloud account sync is not configured.
 
