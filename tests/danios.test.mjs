@@ -29,7 +29,7 @@ test('every enhanced data-x button has an implemented action',()=>{
   const handled=new Set([...enhancement.matchAll(/a===["']([^"']+)["']/g)].map(m=>m[1]));
   for(const action of actions)assert.ok(handled.has(action),'Unimplemented button action: '+action);
   assert.ok(enhancement.includes("data-paint"));
-  assert.ok(enhancement.includes("data-calendar"));
+  assert.ok(html.includes("data-calendar"));
 });
 test('Railway uses current IaC and not deprecated per-service config',async()=>{
   const railway=await readFile(new URL('../.railway/railway.ts',import.meta.url),'utf8');
