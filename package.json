@@ -1,0 +1,9 @@
+{
+  "name": "danios",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Browser-based desktop environment simulator",
+  "scripts": {
+    "check": "node scripts/check.mjs"
+  }
+}
