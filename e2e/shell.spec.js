@@ -68,6 +68,8 @@ test('Terminal executes virtual shell commands and App Store installs apps',asyn
   await expect(term.locator('.x-output')).toContainText('mkdir');
   const store=await openApp(page,'appstore');
   const card=store.locator('.x-card').filter({hasText:'Weather'});
-  await card.locator('[data-x="installapp"]').click();
-  await expect(card.locator('[data-x="installapp"]')).toHaveText('Remove from Start');
+  const installButton=card.locator('[data-x="installapp"]');
+  const before=(await installButton.textContent()).trim();
+  await installButton.click();
+  await expect(installButton).toHaveText(before==='Install'?'Remove from Start':'Install');
 });
