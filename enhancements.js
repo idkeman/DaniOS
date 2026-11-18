@@ -211,6 +211,11 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-pain
 const calendarObserver=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(w=>{if(w.nodeType!==1||!w.matches('.window[data-app="calendar"]'))return;const d=$('.calendar-date',w),t=$('textarea',w);if(d&&t){d.value=new Date().toISOString().slice(0,10);t.value=localStorage.getItem('danios-calendar-'+d.value)||'';d.addEventListener('change',()=>{t.value=localStorage.getItem('danios-calendar-'+d.value)||'';});}})));
 calendarObserver.observe(OS.getDesktop(),{childList:true});
 
+
+function calcKey(w,key){const d=$('.calc-display',w);if(!d)return;let s=d.value==='0'||d.value==='Error'?'':d.value;if(key==='AC'){d.value='0';return;}if(key==='⌫'){d.value=s.slice(0,-1)||'0';return;}if(key==='±'){const m=s.match(/(-?\\d+(?:\\.\\d*)?)$/);if(m)d.value=s.slice(0,m.index)+(m[1].startsWith('-')?m[1].slice(1):'-'+m[1]);else d.value=s?' -('+s+')':'0';return;}if(key==='%'){try{d.value=String(Number((expression(s)/100).toPrecision(12)));}catch(_){d.value='Error';}return;}if(key==='='){try{d.value=String(expression(s.replace(/×/g,'*').replace(/÷/g,'/').replace(/−/g,'-')));}catch(_){d.value='Error';}return;}const map={'×':'*','÷':'/','−':'-'};const v=map[key]||key;if(/^[0-9.]$/.test(v)){if(v==='.'&&s.split(/[+\\-*/%()]/).pop().includes('.'))return;d.value=(s||'')+v;}else if(/^[+\\-*/^]$/.test(v)){d.value=s.replace(/[+\\-*/^]$/,'')+v;}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-calc]');if(!b)return;const w=b.closest('.window');if(!w)return;e.preventDefault();e.stopImmediatePropagation();calcKey(w,b.dataset.calc);},true);
+document.addEventListener('keydown',e=>{const w=e.target.closest('.window[data-app="calculator"]');if(!w)return;const keys={'Enter':'=','Backspace':'⌫','Escape':'AC'};const k=keys[e.key]||e.key;if(/^[0-9.+\\-*/%^]$/.test(k)||['=','⌫','AC'].includes(k)){calcKey(w,k);e.preventDefault();e.stopImmediatePropagation();}},true);
+
 renderStart('');
 window.DaniOSReady=true;window.DaniOSVersion='3.0.0';console.info('DaniOS 3.0 enhancements loaded.');
 })();
