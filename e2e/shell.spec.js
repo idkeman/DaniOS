@@ -109,3 +109,25 @@ test('Notes, tasks and unit converter apps respond',async({page})=>{
   const converter=await openApp(page,'unitconverter');
   await expect(converter.locator('.x-result')).toContainText('1 m');
 });
+
+
+test('Calculator evaluates with the safe arithmetic parser',async({page})=>{
+  const win=await openApp(page,'calculator');
+  for(const key of ['7','+','2','='])await win.locator('[data-calc="'+key+'"]').click();
+  await expect(win.locator('.calc-display')).toHaveValue('9');
+});
+
+test('Quick settings, notification center and lock screen controls work',async({page})=>{
+  await page.locator('#wifiBtn').click();
+  await expect(page.locator('#quickPanel')).toBeVisible();
+  const focus=page.locator('#quickPanel [data-toggle="focus"]');
+  await focus.click();
+  await expect(focus).toHaveClass(/active/);
+  await page.locator('#notifyBtn').click();
+  await expect(page.locator('#notifyPanel')).toBeVisible();
+  await page.locator('#clearNotifications').click();
+  await page.locator('#lockBtn').click();
+  await expect(page.locator('#lockscreen')).toBeVisible();
+  await page.locator('#unlockBtn').click();
+  await expect(page.locator('#lockscreen')).toBeHidden();
+});
