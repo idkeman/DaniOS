@@ -182,6 +182,8 @@ window.addEventListener('online',()=>OS.toast('Browser is online'));window.addEv
 window.addEventListener('keydown',e=>{if(e.ctrlKey&&e.key.toLowerCase()==='e'){e.preventDefault();OS.openApp('explorer');}if(e.ctrlKey&&e.shiftKey&&e.key==='Escape'){e.preventDefault();OS.openApp('tasks');}if(e.ctrlKey&&e.key===','){e.preventDefault();OS.openApp('settings');}});
 
 
+/* Explicit Start/Search routing: keep the launcher responsive even when app-level event delegation changes. */
+document.addEventListener('click',e=>{if(e.target.closest('#startBtn')){e.preventDefault();e.stopImmediatePropagation();const p=$('#startPanel');p.classList.toggle('hidden');if(!p.classList.contains('hidden'))$('#startSearch').focus();return;}if(e.target.closest('#searchBtn')){e.preventDefault();e.stopImmediatePropagation();$('#startPanel').classList.remove('hidden');$('#startSearch').focus();}},true);
 /* Shell controls: taskbar toggles, quick settings, session and workspace persistence. */
 const savedDesktops=read('desktops',null);
 if(Array.isArray(savedDesktops)&&savedDesktops.length&&OS.desktops){OS.desktops.splice(0,OS.desktops.length,...savedDesktops);OS.switchDesktop(Math.min(read('currentDesktop',0),OS.desktops.length-1));}
