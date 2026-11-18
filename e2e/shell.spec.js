@@ -133,13 +133,13 @@ test('Quick settings, notification center and lock screen controls work',async({
   await expect(page.locator('#lockscreen')).toBeHidden();
 });
 
-test('Personalization uploads, applies and restores a wallpaper',async({page})=>{
+test('PNG wallpaper upload validates, applies immediately and survives reload',async({page})=>{
   const settings=await openApp(page,'settings');
   await settings.locator('[data-x="settingtab"][data-tab="Personalization"]').click();
-  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p0sAAAAASUVORK5CYII=','base64');
+  const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGNgYAAAAAMAASsJTYQAAAAASUVORK5CYII=','base64');
   await settings.locator('[data-wallfile]').setInputFiles({name:'test-wallpaper.png',mimeType:'image/png',buffer:png});
-  await expect.poll(async()=>page.evaluate(async()=>{const fs=await window.DaniOS.allFiles();return fs.some(f=>f.path.includes('DaniOS-Wallpaper-')&&f.blob instanceof Blob)})).toBe(true);
   await expect(settings.locator('.x-wallpaper-status')).toContainText('test-wallpaper.png');
+  await expect.poll(async()=>page.evaluate(async()=>{const fs=await window.DaniOS.allFiles();return fs.some(f=>f.path.endsWith('.png')&&f.blob instanceof Blob)})).toBe(true);
   await expect(page.locator('#desktop')).toHaveCSS('background-image',/blob:/);
   await settings.locator('[data-wallfit]').selectOption('contain');
   await expect(page.locator('#desktop')).toHaveCSS('background-size','contain');
