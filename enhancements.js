@@ -100,7 +100,7 @@ function openContext(items,e){$('.x-context')?.remove();const m=document.createE
 async function fileContext(p,e){const f=await get(p);if(!f)return;openContext([{label:'Open',run:()=>renderFileOpen(f)},{label:'Rename',run:async()=>{const n=prompt('New name',name(p));if(!n)return;const dest=path(parent(p)+'/'+n);if(await get(dest))throw Error('Name already exists');await OS.putFile(Object.assign({},f,{path:dest}));await originalRemove(p);const w=$('.window[data-app="explorer"]');if(w)renderExplorer(w,w.dataset.folder);}},{label:'Download',run:()=>downloadFile(f)},{label:'Delete',run:()=>OS.removeFile(p)}],e);}
 async function connectMedia(w){const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});w._stream=stream;$('.x-video',w).srcObject=stream;OS.toast('Camera and microphone are active.');}
 document.addEventListener('click',async e=>{
- const b=e.target.closest('[data-x]');if(!b)return;const a=b.dataset.x,w=b.closest('.window');if(!w&& !['lock','fullscreen','install','reload','wallreset'].includes(a))return;
+ const b=e.target.closest('[data-x]');if(!b)return;const a=b.dataset.x,w=b.closest('.window');if(!w&& !['lock','fullscreen','install','reload','wallreset','search-setting','search-file'].includes(a))return;
  if(!a)return;e.preventDefault();e.stopImmediatePropagation();
  try{
  if(a==='back'||a==='home')renderExplorer(w,'/');else if(a==='up')renderExplorer(w,parent(w.dataset.folder));else if(a==='go')renderExplorer(w,$('.x-path',w).value);else if(a==='folder')renderExplorer(w,b.dataset.path);
