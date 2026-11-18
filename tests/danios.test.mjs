@@ -38,7 +38,8 @@ test('Railway server health, static hosting and security headers',async t=>{
   assert.ok(response&&response.ok,'Server did not become healthy');
   const health=await response.json();
   assert.equal(health.ok,true);
-  assert.equal(health.name,undefined);
+  assert.equal(health.app,'DaniOS');
+  assert.equal(health.version,'3.0.0');
   const page=await fetch('http://127.0.0.1:'+port+'/');
   assert.equal(page.status,200);
   assert.match(page.headers.get('content-type'),/text\/html/);
