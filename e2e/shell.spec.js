@@ -78,3 +78,34 @@ test('Terminal executes virtual shell commands and App Store installs apps',asyn
   await installButton.click();
   await expect(installButton).toHaveText(before==='Install'?'Remove from Start':'Install');
 });
+
+
+test('Calculator evaluates arithmetic using buttons and keyboard',async({page})=>{
+  const win=await openApp(page,'calculator');
+  for(const key of ['7','+','2','='])await win.locator('[data-calc="'+key+'"]').click();
+  await expect(win.locator('.calc-display')).toHaveValue('9');
+});
+
+test('Paint saves drawings into the virtual Pictures folder and Calendar saves notes',async({page})=>{
+  const paint=await openApp(page,'paint');
+  await paint.locator('[data-paint="clear"]').click();
+  await paint.locator('[data-paint="save"]').click();
+  await expect.poll(async()=>page.evaluate(async()=>((await window.DaniOS.allFiles()).some(f=>f.path.startsWith('/Pictures/Paint-'))))).toBe(true);
+  const calendar=await openApp(page,'calendar');
+  const date=await calendar.locator('.calendar-date').inputValue();
+  await calendar.locator('textarea').fill('DaniOS calendar persistence test');
+  await calendar.locator('[data-calendar="save"]').click();
+  await expect.poll(async()=>page.evaluate(d=>localStorage.getItem('danios-calendar-'+d),date)).toBe('DaniOS calendar persistence test');
+});
+
+test('Notes, tasks and unit converter apps respond',async({page})=>{
+  const notes=await openApp(page,'notes');
+  await notes.locator('[data-x="addnote"]').click();
+  await expect(notes.locator('.x-note')).toHaveCount(1);
+  const todo=await openApp(page,'todo');
+  await todo.locator('input[name="task"]').fill('Verify DaniOS task list');
+  await todo.locator('form button').click();
+  await expect(todo.locator('.x-todolist')).toContainText('Verify DaniOS task list');
+  const converter=await openApp(page,'unitconverter');
+  await expect(converter.locator('.x-result')).toContainText('1 m');
+});
