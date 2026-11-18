@@ -12,3 +12,6 @@ jobs:
           node-version: 22
       - run: npm run check
       - run: npm test
+      - run: npm install --no-save @playwright/test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
