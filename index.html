@@ -121,7 +121,7 @@ openDB().then(async d=>{db=d;if(db){const existing=await allFiles();if(!existing
 if('serviceWorker'in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 setInterval(updateClock,1000);updateClock();
 window.DaniOS={
- apps:apps,openApp:(id)=>openApp(id),toast:(msg)=>toast(msg),allFiles:()=>allFiles(),putFile:(file)=>putFile(file),removeFile:(path)=>removeFile(path),
+ apps:apps,desktops:virtualDesktops,getCurrentDesktop:()=>currentDesktop,openApp:(id)=>openApp(id),toast:(msg)=>toast(msg),allFiles:()=>allFiles(),putFile:(file)=>putFile(file),removeFile:(path)=>removeFile(path),
  getContentRenderer:()=>contentFor,setContentRenderer:(fn)=>{contentFor=fn},
  getSettingsRenderer:()=>settingsPage,setSettingsRenderer:(fn)=>{settingsPage=fn},
  getFileRenderer:()=>renderFiles,setFileRenderer:(fn)=>{renderFiles=fn},
