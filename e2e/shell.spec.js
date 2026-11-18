@@ -15,7 +15,7 @@ async function openApp(page,id) {
 
 test.beforeEach(async ({page})=>{
   await page.goto('/');
-  await page.waitForFunction(()=>!!window.DaniOS);
+  await page.waitForFunction(()=>window.DaniOSReady===true);
 });
 
 test('Start menu and app windows launch, minimize and restore',async({page})=>{
