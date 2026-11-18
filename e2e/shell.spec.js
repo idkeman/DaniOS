@@ -1,7 +1,9 @@
 import { test, expect } from '@playwright/test';
 
 async function openApp(page,id) {
+  page.on('pageerror',err=>console.log('BROWSER PAGE ERROR:',err.message));
   await page.locator('#startBtn').click();
+  await expect(page.locator('#startPanel')).toBeVisible();
   const app=page.locator('#appGrid [data-app="'+id+'"]');
   await expect(app).toBeVisible();
   await app.click();
