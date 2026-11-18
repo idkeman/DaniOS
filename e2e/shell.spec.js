@@ -126,6 +126,7 @@ test('Quick settings, notification center and lock screen controls work',async({
   await page.locator('#notifyBtn').click();
   await expect(page.locator('#notifyPanel')).toBeVisible();
   await page.locator('#clearNotifications').click();
+  await page.locator('#startBtn').click();
   await page.locator('#lockBtn').click();
   await expect(page.locator('#lockscreen')).toBeVisible();
   await page.locator('#unlockBtn').click();
