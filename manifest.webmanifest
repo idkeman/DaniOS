@@ -1,9 +1,15 @@
 {
-  "name": "DaniOS Web Desktop",
+  "id": "./",
+  "name": "DaniOS — Browser Desktop",
   "short_name": "DaniOS",
   "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "any",
   "background_color": "#101827",
   "theme_color": "#101827",
-  "description": "A browser-based desktop environment simulator"
+  "description": "A browser-based desktop environment with local apps and permission-based device integrations.",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
 }
