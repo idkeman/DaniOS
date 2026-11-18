@@ -5,7 +5,7 @@ DaniOS is a Windows-inspired desktop environment that runs as a web application.
 ## Run locally
 
 - Node.js 20 or newer: `npm start` serves DaniOS at `http://localhost:3000`.
-- Run checks with `npm run check` and `npm test`.
+- Run static checks with `npm run check`, backend tests with `npm test`, and browser end-to-end tests with `npm run test:e2e` (after `npm install --no-save @playwright/test` and `npx playwright install chromium`).
 - For GitHub Pages, the site can also be served statically from the repository root.
 - HTTPS or localhost is required for service workers and most permission-gated APIs.
 
@@ -51,7 +51,7 @@ The repository includes `server.mjs` and current Railway Infrastructure as Code 
 - `/api/version` — running version and build.
 - `/api/capabilities` — hosting and storage capability description.
 
-To deploy, install the Railway CLI (5.42.1 or newer), authenticate, ensure the Railway account has resource capacity, then run `railway config plan` followed by `railway config apply` from the repository root. The IaC file points at `idkeman/DaniOS` on `main`. Railway currently refused creation of a new project because the account has reached its free-plan resource limit; no unrelated Railway project was modified. Once capacity is available, the committed IaC definition can create the DaniOS web service.
+To deploy, install the Railway CLI (5.42.1 or newer), authenticate, ensure the Railway account has resource capacity, then run `railway config plan` followed by `railway config apply` from the repository root. The IaC authoring package is listed in `devDependencies`. The IaC file points at `idkeman/DaniOS` on `main`. Railway currently refused creation of a new project because the account has reached its free-plan resource limit; no unrelated Railway project was modified. Once capacity is available, the committed IaC definition can create the DaniOS web service.
 
 Railway's Node server is for hosting and health checks only. DaniOS files remain local to the browser; cloud account sync is not configured.
 
