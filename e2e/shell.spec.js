@@ -20,7 +20,7 @@ test.beforeEach(async ({page})=>{
 
 test('Start menu and app windows launch, minimize and restore',async({page})=>{
   const win=await openApp(page,'notepad');
-  await win.locator('[data-x="note-new"]').click();
+  await win.locator('[data-x="newnote"]').click();
   await win.locator('.x-text').fill('DaniOS e2e smoke test');
   page.once('dialog',d=>d.accept('/Documents/E2E-note.txt'));
   await win.locator('[data-x="savenote"]').click();
@@ -35,8 +35,9 @@ test('File Explorer creates folders and sends deleted items to Recycle Bin',asyn
   const win=await openApp(page,'explorer');
   page.once('dialog',d=>d.accept('E2E Folder'));
   await win.locator('[data-x="newfolder"]').click();
-  await expect(win.locator('.x-file')).toContainText('E2E Folder');
-  await page.locator('.x-file').filter({hasText:'E2E Folder'}).click({button:'right'});
+  const folder=win.locator('.x-file').filter({hasText:'E2E Folder'});
+  await expect(folder).toBeVisible();
+  await folder.click({button:'right'});
   await page.locator('.x-context button').filter({hasText:'Delete'}).click();
   await page.locator('#startBtn').click();
   await page.locator('#startSearch').fill('Recycle Bin');
