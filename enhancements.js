@@ -212,5 +212,5 @@ const calendarObserver=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEa
 calendarObserver.observe(OS.getDesktop(),{childList:true});
 
 renderStart('');
-console.info('DaniOS 3.0 enhancements loaded.');
+window.DaniOSReady=true;window.DaniOSVersion='3.0.0';console.info('DaniOS 3.0 enhancements loaded.');
 })();
