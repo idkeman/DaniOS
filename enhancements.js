@@ -229,6 +229,8 @@ document.addEventListener('keydown',e=>{const w=e.target.closest('.window[data-a
 
 renderStart('');
 
+function renderDesktopChoices(){const box=$('#desktopChoices');if(!box)return;box.innerHTML='';(OS.desktops||['Desktop 1']).forEach((name,i)=>{const b=document.createElement('button');b.textContent=(i===(OS.getCurrentDesktop?OS.getCurrentDesktop():0)?'✓ ':'')+name;b.dataset.desktopIndex=i;b.addEventListener('click',()=>{OS.switchDesktop(i);$('#desktopPanel').classList.add('hidden');});box.append(b);});}
+function addDesktop(){if(!OS.desktops)return;OS.desktops.push('Desktop '+(OS.desktops.length+1));OS.switchDesktop(OS.desktops.length-1);renderDesktopChoices();OS.toast('Created '+OS.desktops[OS.desktops.length-1]);}
 /* Explicit shell actions used by the desktop and window chrome. */
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-action]');
